@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.unibl.etf.todo.dto.CategoryCreateDto;
 import org.unibl.etf.todo.dto.CategoryReadDto;
+import org.unibl.etf.todo.dto.CategoryUpdateDto;
 import org.unibl.etf.todo.service.CategoryService;
 
 import java.util.List;
@@ -23,8 +24,8 @@ public class CategoryController {
     }
 
     @PostMapping("/categories")
-    public ResponseEntity<CategoryReadDto> addCategory(@RequestBody CategoryCreateDto category) {
-        return ResponseEntity.ok(categoryService.addCategory(category));
+    public ResponseEntity<CategoryReadDto> addCategory(@RequestBody CategoryCreateDto categoryCreateDto) {
+        return ResponseEntity.ok(categoryService.addCategory(categoryCreateDto));
     }
 
     @GetMapping("/categories/{categoryId}")
@@ -42,5 +43,16 @@ public class CategoryController {
     public ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") Integer categoryId) {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/categories/{categoryId}")
+    public ResponseEntity<CategoryReadDto> editCategory(@PathVariable("categoryId") Integer categoryId, @RequestBody CategoryUpdateDto categoryUpdateDto) {
+        Optional<CategoryReadDto> categoryReadDto = categoryService.editCategory(categoryId, categoryUpdateDto);
+
+        if (categoryReadDto.isPresent()) {
+            return ResponseEntity.ok(categoryReadDto.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

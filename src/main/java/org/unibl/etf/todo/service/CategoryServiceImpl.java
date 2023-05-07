@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.unibl.etf.todo.domain.Category;
 import org.unibl.etf.todo.dto.CategoryCreateDto;
 import org.unibl.etf.todo.dto.CategoryReadDto;
+import org.unibl.etf.todo.dto.CategoryUpdateDto;
 import org.unibl.etf.todo.mapper.CategoryMapper;
 import org.unibl.etf.todo.repo.CategoryRepository;
 
@@ -41,5 +42,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Integer categoryId) {
         categoryRepository.deleteCategory(categoryId);
+    }
+
+    @Override
+    public Optional<CategoryReadDto> editCategory(int categoryId, CategoryUpdateDto categoryUpdateDto) {
+        Optional<Category> category = categoryRepository.editCategory(categoryId, categoryUpdateDto);
+
+        return category.map(categoryMapper::toDto);
     }
 }
