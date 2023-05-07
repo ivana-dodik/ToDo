@@ -8,6 +8,7 @@ import org.unibl.etf.todo.dto.CategoryReadDto;
 import org.unibl.etf.todo.service.CategoryService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -28,7 +29,18 @@ public class CategoryController {
 
     @GetMapping("/categories/{categoryId}")
     public ResponseEntity<CategoryReadDto> getCategory(@PathVariable("categoryId") Integer categoryId) {
-        return ResponseEntity.ok(categoryService.getCategory(categoryId));
+        Optional<CategoryReadDto> categoryReadDto = categoryService.getCategory(categoryId);
+
+        if (categoryReadDto.isPresent()) {
+            return ResponseEntity.ok(categoryReadDto.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    @DeleteMapping("/categories/{categoryId}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") Integer categoryId) {
+        categoryService.deleteCategory(categoryId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -1,6 +1,7 @@
 package org.unibl.etf.todo.repo;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -45,20 +47,32 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
         int id = Objects.requireNonNull(keyHolder.getKey()).intValue();
 
-        return new Category(id, category.name(), null);
+        return new Category(id, category.name(), List.of());
     }
 
     @Override
-    public Category getCategory(Integer categoryId) {
+    public Optional<Category> getCategory(Integer categoryId) {
         String sql = "SELECT c.name AS category_name, t.* FROM category c LEFT JOIN task t ON c.category_id = t.category_id WHERE c.category_id = ?";
 
-        return jdbcTemplate.queryForObject(sql, new CategoryWithTasksRowMapper(), categoryId);
+        try {
+            Category category = jdbcTemplate.queryForObject(sql, new CategoryWithTasksRowMapper(), categoryId);
+            return Optional.ofNullable(category);
+        } catch (EmptyResultDataAccessException ex) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public void deleteCategory(Integer categoryId) {
+        String sql = "DELETE FROM category WHERE category_id = ?";
+
+        jdbcTemplate.update(sql, categoryId);
     }
 
     private static class CategoryRowMapper implements RowMapper<Category> {
         @Override
         public Category mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new Category(rs.getInt("category_id"), rs.getString("name"), null);
+            return new Category(rs.getInt("category_id"), rs.getString("name"), List.of());
         }
     }
 
