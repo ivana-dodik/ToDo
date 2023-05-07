@@ -9,4 +9,6 @@ public interface CategoryService {
     List<CategoryReadDto> getCategories();
 
     CategoryReadDto addCategory(CategoryCreateDto category);
+
+    CategoryReadDto getCategory(Integer categoryId);
 }

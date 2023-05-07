@@ -9,7 +9,6 @@ import org.unibl.etf.todo.mapper.CategoryMapper;
 import org.unibl.etf.todo.repo.CategoryRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,5 +28,12 @@ public class CategoryServiceImpl implements CategoryService {
         Category c = categoryRepository.addCategory(category);
 
         return categoryMapper.toDto(c);
+    }
+
+    @Override
+    public CategoryReadDto getCategory(Integer categoryId) {
+        var category = categoryRepository.getCategory(categoryId);
+
+        return categoryMapper.toDto(category);
     }
 }

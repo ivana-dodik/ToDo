@@ -26,4 +26,9 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.addCategory(category));
     }
 
+    @GetMapping("/categories/{categoryId}")
+    public ResponseEntity<CategoryReadDto> getCategory(@PathVariable("categoryId") Integer categoryId) {
+        return ResponseEntity.ok(categoryService.getCategory(categoryId));
+    }
+
 }
