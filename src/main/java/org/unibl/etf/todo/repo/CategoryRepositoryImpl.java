@@ -70,6 +70,19 @@ public class CategoryRepositoryImpl implements CategoryRepository {
         jdbcTemplate.update(sql, categoryId);
     }
 
+    @Override
+    public Optional<Category> editCategory(int categoryId, CategoryUpdateDto categoryUpdateDto) {
+        String newName = categoryUpdateDto.name();
+        String sql = "UPDATE category SET name = ? WHERE category_id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, newName, categoryId);
+        if (rowsAffected == 0) {
+            return Optional.empty();
+        } else {
+            Category updatedCategory = new Category(categoryId, newName, List.of());
+            return Optional.of(updatedCategory);
+        }
+    }
+
     private static class CategoryRowMapper implements RowMapper<Category> {
         @Override
         public Category mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -99,19 +112,6 @@ public class CategoryRepositoryImpl implements CategoryRepository {
                 }
             } while (rs.next() && rs.getInt("category_id") == categoryId);
             return new Category(categoryId, categoryName, tasks);
-        }
-    }
-
-    @Override
-    public Optional<Category> editCategory(int categoryId, CategoryUpdateDto categoryUpdateDto) {
-        String newName = categoryUpdateDto.name();
-        String sql = "UPDATE category SET name = ? WHERE category_id = ?";
-        int rowsAffected = jdbcTemplate.update(sql, newName, categoryId);
-        if (rowsAffected == 0) {
-            return Optional.empty();
-        } else {
-            Category updatedCategory = new Category(categoryId, newName, List.of());
-            return Optional.of(updatedCategory);
         }
     }
 

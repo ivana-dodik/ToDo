@@ -10,11 +10,11 @@ import java.util.List;
 public class TaskMapper {
     public TaskReadDto toTaskReadDto(Task task) {
         return new TaskReadDto(
-                task.id(),
-                task.name(),
-                task.due(),
-                task.priority(),
-                task.completed()
+                task.getId(),
+                task.getName(),
+                task.getDue(),
+                task.getPriority(),
+                task.isCompleted()
         );
     }
 

@@ -2,10 +2,11 @@ package org.unibl.etf.todo.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.unibl.etf.todo.domain.Category;
+import org.springframework.transaction.annotation.Transactional;
 import org.unibl.etf.todo.domain.Task;
 import org.unibl.etf.todo.dto.TaskCreateDto;
 import org.unibl.etf.todo.dto.TaskReadDto;
+import org.unibl.etf.todo.dto.TaskUpdateDto;
 import org.unibl.etf.todo.mapper.TaskMapper;
 import org.unibl.etf.todo.repo.TaskRepository;
 
@@ -31,5 +32,24 @@ public class TaskServiceImpl implements TaskService {
         Optional<Task> task = taskRepository.addTask(categoryId, taskCreateDto);
 
         return task.map(taskMapper::toTaskReadDto);
+    }
+
+    @Override
+    public void deleteTask(Integer taskId) {
+        taskRepository.deleteTask(taskId);
+    }
+
+
+    @Override
+    @Transactional
+    public Optional<TaskReadDto> editTask(int taskId, TaskUpdateDto taskUpdateDto) {
+        Optional<Task> originalTask = taskRepository.getTaskById(taskId);
+
+        if (originalTask.isPresent()) {
+            Optional<Task> task = taskRepository.editTask(taskId, taskUpdateDto, originalTask.get());
+            return task.map(taskMapper::toTaskReadDto);
+        } else {
+            return Optional.empty();
+        }
     }
 }
