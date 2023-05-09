@@ -15,4 +15,6 @@ public interface TaskService {
     void deleteTask(Integer taskId);
 
     Optional<TaskReadDto> editTask(int taskId, TaskUpdateDto taskUpdateDto);
+
+    Optional<TaskReadDto> toggleComplete(int taskId);
 }

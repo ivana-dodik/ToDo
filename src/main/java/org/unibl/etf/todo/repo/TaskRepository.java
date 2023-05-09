@@ -17,4 +17,6 @@ public interface TaskRepository {
     Optional<Task> editTask(int taskId, TaskUpdateDto taskUpdateDto, Task task);
 
     Optional<Task> getTaskById(int taskId);
+
+    Optional<Task> toggleComplete(int taskId);
 }

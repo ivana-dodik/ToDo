@@ -52,63 +52,6 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public Optional<Task> editTask(int taskId, TaskUpdateDto taskUpdateDto, Task originalTask) {
-        /*
-        @Override
-public Optional<Task> editTask(int taskId, TaskUpdateDto taskUpdateDto) {
-    String newName = taskUpdateDto.name();
-    LocalDateTime newDue = taskUpdateDto.due();
-    Priority newPriority = taskUpdateDto.priority();
-    boolean newCompleted = taskUpdateDto.completed();
-
-    // Build the SQL query based on the non-null fields
-    StringBuilder sqlBuilder = new StringBuilder("UPDATE task SET ");
-    List<Object> params = new ArrayList<>();
-    if (newName != null) {
-        sqlBuilder.append("name = ?, ");
-        params.add(newName);
-    }
-    if (newDue != null) {
-        sqlBuilder.append("due = ?, ");
-        params.add(newDue);
-    }
-    if (newPriority != null) {
-        sqlBuilder.append("priority = ?, ");
-        params.add(newPriority.name());
-    }
-    if (newCompleted != null) {
-        sqlBuilder.append("completed = ?, ");
-        params.add(newCompleted);
-    }
-    // Remove the trailing comma and space
-    sqlBuilder.setLength(sqlBuilder.length() - 2);
-    sqlBuilder.append(" WHERE task_id = ?");
-    params.add(taskId);
-
-    int rowsAffected = jdbcTemplate.update(sqlBuilder.toString(), params.toArray());
-
-    if (rowsAffected == 0) {
-        return Optional.empty();
-    } else {
-        // Fetch the updated task from the database and return it
-        String selectSql = "SELECT * FROM task WHERE task_id = ?";
-        Task task = jdbcTemplate.queryForObject(selectSql, new Object[]{taskId}, new TaskRowMapper());
-        return Optional.of(task);
-    }
-
-         */
-//        String newName = taskUpdateDto.name();
-//        LocalDateTime newDue = taskUpdateDto.due();
-//        Priority newPriority = taskUpdateDto.priority();
-//        boolean newCompleted = taskUpdateDto.completed();
-//        String sql = "UPDATE task SET name = ?, due = ?, priority = ?, completed = ? WHERE task_id = ?";
-//        int rowsAffected = jdbcTemplate.update(sql, newName, newDue, newPriority.name(), newCompleted, taskId);
-//        if (rowsAffected == 0) {
-//            return Optional.empty();
-//        } else {
-//            Task updateTask = new Task(taskId, newName, newDue, newPriority, newCompleted);
-//            return Optional.of(updateTask);
-//        }
-
         String newName = taskUpdateDto.name();
         LocalDateTime newDue = taskUpdateDto.due();
         Priority newPriority = taskUpdateDto.priority();
@@ -157,6 +100,28 @@ public Optional<Task> editTask(int taskId, TaskUpdateDto taskUpdateDto) {
         }
     }
 
+    @Override
+    public Optional<Task> getTaskById(int taskId) {
+        String sql = "SELECT * FROM task WHERE task_id = ?";
+        try {
+            Task task = jdbcTemplate.queryForObject(sql, new TaskRowMapper(), taskId);
+            return Optional.ofNullable(task);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<Task> toggleComplete(int taskId) {
+        String sql = "UPDATE Task SET completed = NOT completed WHERE task_id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, taskId);
+        if (rowsAffected == 0) {
+            return Optional.empty();
+        } else {
+            return getTaskById(taskId);
+        }
+    }
+
     private static class TaskRowMapper implements RowMapper<Task> {
         @Override
         public Task mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -170,17 +135,6 @@ public Optional<Task> editTask(int taskId, TaskUpdateDto taskUpdateDto) {
             Priority priority = Priority.valueOf(rs.getString("priority"));
             boolean completed = rs.getBoolean("completed");
             return new Task(id, name, due, priority, completed);
-        }
-    }
-
-    @Override
-    public Optional<Task> getTaskById(int taskId) {
-        String sql = "SELECT * FROM task WHERE task_id = ?";
-        try {
-            Task task = jdbcTemplate.queryForObject(sql, new TaskRowMapper(), taskId);
-            return Optional.ofNullable(task);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
         }
     }
 }

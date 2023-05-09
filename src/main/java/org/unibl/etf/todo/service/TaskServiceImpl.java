@@ -52,4 +52,10 @@ public class TaskServiceImpl implements TaskService {
             return Optional.empty();
         }
     }
+
+    @Override
+    public Optional<TaskReadDto> toggleComplete(int taskId) {
+        Optional<Task> task = taskRepository.toggleComplete(taskId);
+        return task.map(taskMapper::toTaskReadDto);
+    }
 }

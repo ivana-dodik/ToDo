@@ -59,7 +59,13 @@ public class TaskController {
 
     @PatchMapping("/tasks/{taskId}/toggle-complete")
     public ResponseEntity<TaskReadDto> toggleComplete(@PathVariable("taskId") Integer taskId) {
-        return null;
+        Optional<TaskReadDto> task = taskService.toggleComplete(taskId);
+
+        if (task.isPresent()) {
+            return ResponseEntity.of(task);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }
